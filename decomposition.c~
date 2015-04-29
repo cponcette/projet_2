@@ -1,74 +1,152 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 	
-struct facteur {
+struct facteur { // structure chainée de facteurs
 	int val;
-	struct facteur *nxt;
+	int nbApp;
+	char *nomF;
+	struct facteur *next;
 };
 
+struct facteur* liste=NULL; // liste qui va permettre de stocker tous les facteurs premiers
 
-void ajout(struct facteur *liste, int valeur) {
-	struct facteur new;
-	new.val = valeur;
-	new.nxt = NULL;
-	if (liste == NULL) { // si la liste est vide, il suffit de renvoyer l'élément créé
-		return;;
+
+
+/*
+ * Fonction qui vérifie si la valeur entrée est déjà dans la liste, si c'est le cas, elle renvois un pointeur
+ * vers cet élément, sinon renvoit NULL.
+ */
+struct facteur* estDansLaListe(int valeur) {
+	struct facteur *tmp = liste; // pointeur temporaire pour parcourir la liste 
+	while(tmp != NULL) {
+		if (tmp->val == valeur) { // si la valeur est contenue dans l'élément de la liste
+			return tmp;
+		} // sinon, continuez de visiter la liste
+		tmp = tmp->next;
+	} // si on a fait le tour de la liste, c'est que la valeur n'est pas contenue dedans
+	return NULL;
+}
+
+
+/*
+ * Fonction qui ajoute le nouveau facteur à la liste s'il n'y est pas déjà, et si il y est déjà, incrémente son
+ * nombre d'apparitions de 1.
+ */
+void ajouteListe(int valeur, char nomFichier[]) {
+
+	struct facteur *tmp = estDansLaListe(valeur);
+	
+	if (tmp != NULL) { // si cette valeur se trouve déjà dans la liste, on incrémente simplement son nombre d'apparition
+//NOTE : ce n'est pas la peine de modifier le nom du fichier puisque ce facteur ne nous intéresse plus
+		tmp->nbApp=tmp->nbApp+1;
 	}
-	else { // sinon, on parcourt la liste à l'aide d'un pointeur temporaire et on indique que le dernier élément de la liste est relié au nouvel élément
-		struct facteur* temp=liste;
-		while(temp->nxt != NULL) {
-			temp = temp->nxt;
+
+	else { // si elle n'est pas dans la liste, on la rajoute à la fin
+
+		struct facteur *new=malloc(sizeof(struct facteur)); // création du nouvel élément
+		new->val = valeur;
+		new->nbApp = 1;
+		new->nomF= nomFichier;
+		new->next = NULL;
+
+		if (liste == NULL) { // si la liste est vide, il suffit que la liste devienne le nouvel élément
+			liste=new;
+			return;
 		}
-		temp->nxt= &new;
-		return;
+
+		else { // la liste n'est pas vide, on la parcourt à l'aide d'un pointeur temporaire et on relie le dernier élément de la liste au nouvel élément
+			struct facteur* temp=liste;
+			while(temp->next != NULL) {
+				temp = temp->next;
+			}
+			temp->next= new;
+			return;
+		}
 	}
 }
 
-void decomposition(struct facteur *liste, int a) {
-	if (a==0 || a==1) {
-		printf("le nombre %d n'est pas premier", a);
+
+/*
+ * Fonction qui affiche la liste des facteurs
+ */
+void afficheListe() {
+	struct facteur *tmp = liste; // pointeur temporaire pour parcourir la liste 
+	while(tmp != NULL) {
+		printf("le facteur %d apparait %d fois\n", tmp->val, tmp->nbApp);
+		tmp = tmp->next;
+	}
+}
+
+
+/* 
+ * Retourne 1 si l'entier n est premier, 0 sinon
+ */
+int estPremier(int n) {
+	if (n==0 || n==1) {
+		return 0;
 	}
 	else {
+		int i;
+		int m=sqrt(n);
+		for (i=2;i<=m;i++) {
+			if ((n%i)==0) {
+				return 0;
+			}
+		}
+		return 1;
+	}	
+}
+
+
+/*
+ * Ajoute à la liste tous les facteurs premiers du nombre 'a' donné
+ */
+void decompose(int a) {
+	if (a!=0 && a!=1) {
 		int b=sqrt(a);
 		int i=2;
-		while (a<b) {
-			if (a%i) {
-				ajout(liste, i);
-				a=a/i;
+		while (i<=b) {
+			if (estPremier(a)==1) {
+				ajouteListe(a,"Nomdufichier");
+				return;
 			}
-			i++;
+			if (estPremier(i)==1) {
+				if ( (a%i) == 0 ) {
+					ajouteListe(i,"Nomdufichier");
+					a = a/i;
+				}
+				else {
+					i++;
+				}
+			}
+			else {
+				i++;
+			}
+
 		}
 	}
 	return;
 }
 
-void afficherListe(struct facteur * liste) {
-	struct facteur *tmp = liste;
-	printf("salut\n");
-	while(*tmp != NULL) {
-		printf("coucou\n");
-		printf("%d", tmp->val);
-		tmp = tmp->nxt;
-	}
-}
-
 void main(int argc, const char *argv[]) {
-
-struct facteur *liste1 = NULL;
-struct facteur *liste2 = NULL;
-struct facteur *liste3 = NULL;
-struct facteur *liste4 = NULL;
-
-decomposition(liste1, 43);
-decomposition(liste2, 147);
-decomposition(liste3,1);
-decomposition(liste4,2);
-
-afficherListe(liste1);
-afficherListe(liste2);
-afficherListe(liste3);
-afficherListe(liste4);
-printf("bisou\n");
-return;
+	decompose(1);
+	decompose(527);
+	decompose(869);
+	decompose(1341);
+	decompose(2247);
+	decompose(2359);
+	decompose(3771);
+	decompose(1678);
+	decompose(236);
+	decompose(2578);
+	decompose(5480);
+	decompose(415);
+	decompose(16);
+	decompose(13);
+	decompose(12);
+	decompose(28);
+	afficheListe();
+	exit(EXIT_SUCCESS);
 }
