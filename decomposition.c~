@@ -79,6 +79,29 @@ void afficheListe() {
 	}
 }
 
+/*
+ * Retourne le facteur premier unique s'il y en a un, si il y a plusieurs facteurs premiers unique
+ * ou si il n'y en a pas, retoune NULL
+ */
+struct facteur *unique() {
+	struct facteur *tmp = liste; // pointeur temporaire pour parcourir la liste
+	struct facteur *temp;
+	while (tmp != NULL) {
+		if (tmp->nbApp==1 && temp!=NULL) {
+			return NULL;
+		}
+
+		if (tmp->nbApp==1) {
+			temp=tmp;
+		}
+
+		else {
+			tmp = tmp->next;
+		}
+	}
+	return NULL;
+}
+
 
 /* 
  * Retourne 1 si l'entier n est premier, 0 sinon
@@ -148,5 +171,6 @@ void main(int argc, const char *argv[]) {
 	decompose(12);
 	decompose(28);
 	afficheListe();
+	printf("%p\n", unique()); 
 	exit(EXIT_SUCCESS);
 }

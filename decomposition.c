@@ -45,7 +45,7 @@ void ajouteListe(int valeur, char nomFichier[]) {
 
 	else { // si elle n'est pas dans la liste, on la rajoute à la fin
 
-		struct facteur *new=malloc(sizeof(struct facteur)); // création du nouvel élément
+		struct facteur *new=(struct facteur *) malloc(sizeof(struct facteur)); // création du nouvel élément
 		new->val = valeur;
 		new->nbApp = 1;
 		new->nomF= nomFichier;
